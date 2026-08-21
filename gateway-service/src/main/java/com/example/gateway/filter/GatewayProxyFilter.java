@@ -57,6 +57,17 @@ public class GatewayProxyFilter extends OncePerRequestFilter {
         String method = request.getMethod();
         log.info("[Gateway] {} {}", method, path);
 
+        // CORS headers
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "*");
+
+        // Handle preflight OPTIONS request
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         String targetUrl = null;
 
         // 1. API Partner (7 & 8): /api/public/** -> Requires X-API-KEY -> course-service /courses
@@ -173,12 +184,16 @@ public class GatewayProxyFilter extends OncePerRequestFilter {
                 values.forEach(value -> response.addHeader(name, value));
             }
         });
+        response.setHeader("Access-Control-Allow-Origin", "*");
         if (backendResponse.getBody() != null && backendResponse.getBody().length > 0) {
             response.getOutputStream().write(backendResponse.getBody());
         }
     }
 
     private void sendError(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "*");
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
