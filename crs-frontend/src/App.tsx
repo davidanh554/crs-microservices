@@ -1,27 +1,43 @@
-import { useEffect, useState } from 'react';
-import { getCourses } from './api/courseApi'; // <--- Kiểm tra chính xác đường dẫn này
-import type { Course } from './types/course';
+import { useState, useCallback } from 'react';
+import { useCourses } from './api/useCourses';
+import SearchBox from './components/SearchBox';
+import CourseList from './components/CourseList';
+import Pagination from './components/Pagination';
 
-function App() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [error, setError] = useState<string | null>(null);
+export default function App() {
+  const [keyword, setKeyword] = useState('');
+  const [page, setPage] = useState(0);
 
-  useEffect(() => {
-    getCourses()
-      .then((res) => setCourses(res.data.content))
-      .catch((err) => {
-        console.error(err);
-        setError('Khong ket noi duoc toi he thong. Kiem tra lai api-gateway da chay chua.');
-      });
+  const { courses, totalPages, state, errorMessage, refetch } = useCourses(keyword, page);
+
+  const handleSearch = useCallback((newKeyword: string) => {
+    setKeyword((prevKeyword) => {
+      if (prevKeyword !== newKeyword) {
+        setPage(0); // Reset về trang đầu khi từ khóa thay đổi
+      }
+      return newKeyword;
+    });
   }, []);
 
   return (
-    <div style={{ padding: 24, fontFamily: 'sans-serif' }}>
-      <h1>Kiem tra ket noi CRS qua Gateway</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <pre>{JSON.stringify(courses, null, 2)}</pre>
+    <div style={{ padding: 24, fontFamily: 'sans-serif', maxWidth: 800, margin: '0 auto' }}>
+      <h1>Danh sách môn học</h1>
+      <SearchBox onSearch={handleSearch} />
+
+      <div style={{ marginTop: 16 }}>
+        <CourseList
+          courses={courses}
+          state={state}
+          errorMessage={errorMessage}
+          onRetry={refetch}
+        />
+      </div>
+
+      <Pagination
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
     </div>
   );
 }
-
-export default App;
