@@ -6,4 +6,6 @@ C:\Users\Admin\Downloads\crs-microservices\registration-service\src\main\java\vn
 C:\Users\Admin\Downloads\crs-microservices\registration-service\src\main\java\vn\edu\crs\registrationservice\exception\GlobalExceptionHandler.java
 C:\Users\Admin\Downloads\crs-microservices\registration-service\src\main\java\vn\edu\crs\registrationservice\RegistrationServiceApplication.java
 C:\Users\Admin\Downloads\crs-microservices\registration-service\src\main\java\vn\edu\crs\registrationservice\repository\RegistrationRepository.java
+C:\Users\Admin\Downloads\crs-microservices\registration-service\src\main\java\vn\edu\crs\registrationservice\security\JwtAuthFilter.java
+C:\Users\Admin\Downloads\crs-microservices\registration-service\src\main\java\vn\edu\crs\registrationservice\security\SecurityConfig.java
 C:\Users\Admin\Downloads\crs-microservices\registration-service\src\main\java\vn\edu\crs\registrationservice\service\RegistrationService.java
