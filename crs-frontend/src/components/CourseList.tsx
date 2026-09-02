@@ -6,12 +6,19 @@ interface CourseListProps {
   state: LoadState;
   errorMessage: string;
   onRetry: () => void;
+  onEdit: (course: Course) => void;
+  onDelete: (course: Course) => void;
 }
 
-export default function CourseList({ courses, state, errorMessage, onRetry }: CourseListProps) {
-  if (state === 'loading') {
-    return <p>Đang tải danh sách môn học...</p>;
-  }
+export default function CourseList({
+  courses,
+  state,
+  errorMessage,
+  onRetry,
+  onEdit,
+  onDelete,
+}: CourseListProps) {
+  if (state === 'loading') return <p>Đang tải danh sách môn học...</p>;
 
   if (state === 'error') {
     return (
@@ -22,26 +29,34 @@ export default function CourseList({ courses, state, errorMessage, onRetry }: Co
     );
   }
 
-  if (state === 'empty') {
-    return <p>Không tìm thấy môn học nào phù hợp.</p>;
-  }
+  if (state === 'empty') return <p>Không tìm thấy môn học nào phù hợp.</p>;
 
   return (
     <table style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead>
         <tr style={{ textAlign: 'left', borderBottom: '2px solid #333' }}>
-          <th style={{ padding: '8px 0' }}>Tên môn học</th>
+          <th>Tên môn học</th>
           <th>Số tín chỉ</th>
           <th>Số chỗ còn lại</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
         {courses.map((course) => (
           <tr key={course.id} style={{ borderBottom: '1px solid #eee' }}>
-            <td style={{ padding: '8px 0' }}>{course.tenMonHoc}</td>
+            <td>{course.tenMonHoc}</td>
             <td>{course.soTinChi}</td>
             <td style={{ color: course.soChoConLai === 0 ? '#b91c1c' : 'inherit' }}>
               {course.soChoConLai} / {course.soChoToiDa}
+            </td>
+            <td>
+              <button onClick={() => onEdit(course)}>Sửa</button>
+              <button
+                onClick={() => onDelete(course)}
+                style={{ marginLeft: 8, color: '#b91c1c' }}
+              >
+                Xóa
+              </button>
             </td>
           </tr>
         ))}

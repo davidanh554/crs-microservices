@@ -13,3 +13,14 @@ export interface PagedResponse<T> {
   number: number;
   size: number;
 }
+export interface CourseFormValues {
+  tenMonHoc: string;
+  soTinChi: string; // dùng string trong form để dễ kiểm soát input rỗng, sẽ parseInt/Number khi gửi đi
+  soChoToiDa: string;
+}
+
+export const emptyCourseForm: CourseFormValues = {
+  tenMonHoc: '',
+  soTinChi: '',
+  soChoToiDa: '',
+};
