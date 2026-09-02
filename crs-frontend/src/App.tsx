@@ -1,107 +1,40 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useCourses } from './api/useCourses';
-import { createCourse, updateCourse, deleteCourse } from './api/courseApi';
-import SearchBox from './components/SearchBox';
-import CourseList from './components/CourseList';
-import Pagination from './components/Pagination';
-import CourseForm from './components/CourseForm';
-import type { Course, CourseFormValues } from './types/course';
-import type { ApiErrorResponse } from './types/apiError';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPage from './pages/LoginPage';
+import CoursesPage from './pages/CoursesPage';
+import AdminCoursesPage from './pages/AdminCoursesPage';
+import RegisterCoursePage from './pages/RegisterCoursePage';
+import Navbar from './components/Navbar';
 
 function App() {
-  const [keyword, setKeyword] = useState('');
-  const [page, setPage] = useState(0);
-  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const { courses, totalPages, state, errorMessage, refetch } = useCourses(keyword, page);
-
-const handleSearch = (newKeyword: string) => {
-  // Chỉ reset về trang 0 nếu từ khóa tìm kiếm thực sự thay đổi
-  if (newKeyword !== keyword) {
-    setKeyword(newKeyword);
-    setPage(0);
-  }
-};
-
-  // Trích xuất thông báo lỗi từ Backend (cả lỗi nghiệp vụ lẫn lỗi validation từng trường)
-  const extractErrorMessage = (err: unknown): string => {
-    if (axios.isAxiosError<ApiErrorResponse>(err)) {
-      const data = err.response?.data;
-      if (data?.message) return data.message;
-
-      // Trường hợp lỗi validation server trả về dạng { tenMonHoc: "...", soTinChi: "..." }
-      if (data) {
-        const firstFieldError = Object.values(data).find((v) => typeof v === 'string');
-        if (firstFieldError) return firstFieldError as string;
-      }
-    }
-    return 'Đã xảy ra lỗi, vui lòng thử lại.';
-  };
-
-  // Xử lý gửi Form (Thêm hoặc Cập nhật)
-  const handleFormSubmit = async (values: CourseFormValues) => {
-    setSubmitting(true);
-    setFormError(null);
-    try {
-      if (editingCourse) {
-        await updateCourse(editingCourse.id, values);
-      } else {
-        await createCourse(values);
-      }
-      setEditingCourse(null);
-      refetch(); // Đồng bộ lại danh sách ngay lập tức mà không cần F5
-    } catch (err) {
-      setFormError(extractErrorMessage(err));
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  // Xử lý Xóa môn học
-  const handleDelete = async (course: Course) => {
-    if (!window.confirm(`Xóa môn học "${course.tenMonHoc}"?`)) return;
-    try {
-      await deleteCourse(course.id);
-      refetch(); // Cập nhật lại danh sách sau khi xóa thành công
-    } catch (err) {
-      alert(extractErrorMessage(err));
-    }
-  };
-
   return (
-    <div style={{ padding: 24, fontFamily: 'sans-serif', maxWidth: 800, margin: '0 auto' }}>
-      <h1>Quản lý môn học (Admin)</h1>
-
-      <CourseForm
-        editingCourse={editingCourse}
-        onSubmit={handleFormSubmit}
-        onCancel={() => setEditingCourse(null)}
-        submitting={submitting}
-        serverError={formError}
-      />
-
-      <SearchBox onSearch={handleSearch} />
-
-      <div style={{ marginTop: 16 }}>
-        <CourseList
-          courses={courses}
-          state={state}
-          errorMessage={errorMessage}
-          onRetry={refetch}
-          onEdit={setEditingCourse}
-          onDelete={handleDelete}
-        />
-      </div>
-
-      <Pagination
-        currentPage={page}
-        totalPages={totalPages}
-        onPageChange={setPage}
-      />
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Navigate to="/courses" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/courses" element={<CoursesPage />} />
+          <Route
+            path="/admin/courses"
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <AdminCoursesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/register-course"
+            element={
+              <ProtectedRoute requiredRole="STUDENT">
+                <RegisterCoursePage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
