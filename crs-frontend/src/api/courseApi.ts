@@ -7,6 +7,10 @@ export const getCourses = (keyword?: string, page = 0, size = 10) => {
   });
 };
 
+export const getCourseById = (id: number) => {
+  return axiosClient.get<Course>(`/api/courses/${id}`);
+};
+
 // Hàm chuyển đổi dữ liệu từ dạng chuỗi trên form sang dạng số để khớp với Backend DTO
 const toPayload = (values: CourseFormValues) => ({
   tenMonHoc: values.tenMonHoc.trim(),

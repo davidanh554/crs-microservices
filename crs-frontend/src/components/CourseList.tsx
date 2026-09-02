@@ -1,3 +1,6 @@
+// path: crs-frontend/src/components/CourseList.tsx
+// purpose: bo sung prop onRegister (tuy chon) - trang Dang ky hoc phan se dung prop nay,
+// cac trang khac (CoursesPage, AdminCoursesPage) khong truyen vao nen khong bi anh huong
 import type { Course } from '../types/course';
 import type { LoadState } from '../api/useCourses';
 
@@ -8,6 +11,8 @@ interface CourseListProps {
   onRetry: () => void;
   onEdit?: (course: Course) => void;
   onDelete?: (course: Course) => void;
+  onRegister?: (course: Course) => void;
+  registeringId?: number | null; // id mon dang trong qua trinh goi API dang ky, de disable rieng nut do
 }
 
 export default function CourseList({
@@ -17,27 +22,32 @@ export default function CourseList({
   onRetry,
   onEdit,
   onDelete,
+  onRegister,
+  registeringId,
 }: CourseListProps) {
-  if (state === 'loading') return <p>Đang tải danh sách môn học...</p>;
+  if (state === 'loading') {
+    return <p>Đang tải danh sách môn học...</p>;
+  }
 
   if (state === 'error') {
     return (
-      <div style={{ color: '#b91c1c' }}>
-        <p>{errorMessage}</p>
+      <div>
+        <p style={{ color: 'red' }}>{errorMessage}</p>
         <button onClick={onRetry}>Thử lại</button>
       </div>
     );
   }
 
-  if (state === 'empty') return <p>Không tìm thấy môn học nào phù hợp.</p>;
+  if (state === 'empty') {
+    return <p>Không tìm thấy môn học nào phù hợp.</p>;
+  }
 
-  // Kiểm tra xem có truyền ít nhất một trong hai hàm sửa/xóa vào hay không
-  const showActions = !!onEdit || !!onDelete;
+  const showActions = !!onEdit || !!onDelete || !!onRegister;
 
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <table border={1} cellPadding={8} style={{ width: '100%', borderCollapse: 'collapse', marginTop: 16 }}>
       <thead>
-        <tr style={{ textAlign: 'left', borderBottom: '2px solid #333' }}>
+        <tr>
           <th>Tên môn học</th>
           <th>Số tín chỉ</th>
           <th>Số chỗ còn lại</th>
@@ -46,21 +56,36 @@ export default function CourseList({
       </thead>
       <tbody>
         {courses.map((course) => (
-          <tr key={course.id} style={{ borderBottom: '1px solid #eee' }}>
+          <tr key={course.id}>
             <td>{course.tenMonHoc}</td>
             <td>{course.soTinChi}</td>
-            <td style={{ color: course.soChoConLai === 0 ? '#b91c1c' : 'inherit' }}>
+            <td>
               {course.soChoConLai} / {course.soChoToiDa}
             </td>
             {showActions && (
               <td>
-                {onEdit && <button onClick={() => onEdit(course)}>Sửa</button>}
+                {onEdit && (
+                  <button onClick={() => onEdit(course)}>Sửa</button>
+                )}
                 {onDelete && (
                   <button
                     onClick={() => onDelete(course)}
                     style={{ marginLeft: 8, color: '#b91c1c' }}
                   >
                     Xóa
+                  </button>
+                )}
+                {onRegister && (
+                  <button
+                    onClick={() => onRegister(course)}
+                    disabled={course.soChoConLai === 0 || registeringId === course.id}
+                    style={{ marginLeft: 8 }}
+                  >
+                    {registeringId === course.id
+                      ? 'Đang đăng ký...'
+                      : course.soChoConLai === 0
+                      ? 'Hết chỗ'
+                      : 'Đăng ký'}
                   </button>
                 )}
               </td>

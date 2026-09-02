@@ -17,7 +17,10 @@ export default function Navbar() {
         <Link to="/admin/courses">Quản trị môn học</Link>
       )}
       {isAuthenticated && user?.role === 'STUDENT' && (
-        <Link to="/register-course">Đăng ký học phần</Link>
+        <>
+          <Link to="/register-course">Đăng ký học phần</Link>
+          <Link to="/my-registrations">Môn học đã đăng ký</Link>
+        </>
       )}
       <div style={{ marginLeft: 'auto' }}>
         {isAuthenticated ? (

@@ -5,9 +5,10 @@ import LoginPage from './pages/LoginPage';
 import CoursesPage from './pages/CoursesPage';
 import AdminCoursesPage from './pages/AdminCoursesPage';
 import RegisterCoursePage from './pages/RegisterCoursePage';
+import MyRegistrationsPage from './pages/MyRegistrationsPage';
 import Navbar from './components/Navbar';
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -32,10 +33,16 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/my-registrations"
+            element={
+              <ProtectedRoute requiredRole="STUDENT">
+                <MyRegistrationsPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
   );
 }
-
-export default App;

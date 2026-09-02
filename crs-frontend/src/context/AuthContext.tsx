@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { LoginResponse } from '../types/auth';
 
 interface AuthUser {
+    id: number;
   username: string;
   role: 'ADMIN' | 'STUDENT';
 }
@@ -19,20 +20,22 @@ const TOKEN_KEY = 'crs_token';
 const USER_KEY = 'crs_user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-
-  // Khôi phục phiên đăng nhập khi F5 trang (đọc lại từ localStorage)
-  useEffect(() => {
+  const [user, setUser] = useState<AuthUser | null>(() => {
     const savedUser = localStorage.getItem(USER_KEY);
     const savedToken = localStorage.getItem(TOKEN_KEY);
     if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
+      try {
+        return JSON.parse(savedUser);
+      } catch {
+        return null;
+      }
     }
-  }, []);
+    return null;
+  });
 
-  const login = (data: LoginResponse) => {
+const login = (data: LoginResponse) => {
+    const authUser: AuthUser = { id: data.userId, username: data.username, role: data.role };
     localStorage.setItem(TOKEN_KEY, data.token);
-    const authUser: AuthUser = { username: data.username, role: data.role };
     localStorage.setItem(USER_KEY, JSON.stringify(authUser));
     setUser(authUser);
   };

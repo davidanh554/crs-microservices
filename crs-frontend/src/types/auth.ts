@@ -4,6 +4,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
+  userId: number; // Bổ sung userId khớp với LoginResponseDTO
   token: string;
   username: string;
   role: 'ADMIN' | 'STUDENT';
