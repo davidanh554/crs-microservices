@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
 import CoursesPage from './pages/CoursesPage';
@@ -7,6 +7,11 @@ import AdminCoursesPage from './pages/AdminCoursesPage';
 import RegisterCoursePage from './pages/RegisterCoursePage';
 import MyRegistrationsPage from './pages/MyRegistrationsPage';
 import Navbar from './components/Navbar';
+
+function CatchAllRoute() {
+  const { isAuthenticated } = useAuth();
+  return <Navigate to={isAuthenticated ? "/courses" : "/login"} replace />;
+}
 
 export default function App() {
   return (
@@ -34,6 +39,10 @@ export default function App() {
             }
           />
           <Route
+            path="/register/course"
+            element={<Navigate to="/register-course" replace />}
+          />
+          <Route
             path="/my-registrations"
             element={
               <ProtectedRoute requiredRole="STUDENT">
@@ -41,6 +50,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<CatchAllRoute />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

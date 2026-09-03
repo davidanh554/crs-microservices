@@ -13,13 +13,15 @@
         <module name="course-service" />
         <module name="auth-service" />
       </profile>
-      <profile name="Annotation profile for gateway-service" enabled="true">
+      <profile name="Annotation profile for registration-service" enabled="true">
         <sourceOutputDir name="../generated-sources/annotations" />
         <sourceTestOutputDir name="../generated-test-sources/test-annotations" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
         <module name="gateway-service.test" />
+        <module name="registration-service.test" />
+        <module name="registration-service.main" />
         <module name="gateway-service.main" />
       </profile>
     </annotationProcessing>
