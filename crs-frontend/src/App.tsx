@@ -7,6 +7,7 @@ import AdminCoursesPage from './pages/AdminCoursesPage';
 import RegisterCoursePage from './pages/RegisterCoursePage';
 import MyRegistrationsPage from './pages/MyRegistrationsPage';
 import Navbar from './components/Navbar';
+import ApiKeysPage from './pages/ApiKeysPage';
 
 function CatchAllRoute() {
   const { isAuthenticated } = useAuth();
@@ -27,6 +28,14 @@ export default function App() {
             element={
               <ProtectedRoute requiredRole="ADMIN">
                 <AdminCoursesPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/api-keys"
+            element={
+              <ProtectedRoute requiredRole="ADMIN">
+                <ApiKeysPage />
               </ProtectedRoute>
             }
           />
